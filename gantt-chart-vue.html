@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <title>GanttElastic editor demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+
+    <script src="https://unpkg.com/gantt-elastic/dist/GanttElastic.umd.js"></script>
+    <script src="https://unpkg.com/gantt-elastic-header/dist/Header.umd.js"></script>
+  </head>
+
+  <body>
+    <div style="width:100%;height:100%">
+      <div id="app" v-if="!destroy">
+        <gantt-elastic :tasks="tasks" :options="options" :dynamic-style="dynamicStyle">
+          <gantt-header slot="header"></gantt-header>
+        </gantt-elastic>
+      </div>
+    </div>
+
+    <script>
+      // function getDate(hours) {
+      //   const currentDate = new Date();
+      //   const currentYear = currentDate.getFullYear();
+      //   const currentMonth = currentDate.getMonth();
+      //   const currentDay = currentDate.getDate();
+      //   const timeStamp = new Date(currentYear, currentMonth, currentDay, 0, 0, 0).getTime();
+      //   return new Date(timeStamp + hours * 60 * 60 * 1000).getTime();
+      // }
+
+      let tasks = [
+        {
+          id: 1,
+          label: 'Make some noise',
+          user:'User1',
+          start: '2021-11-14T00:00:00Z',
+          end: '2021-11-17T17:00:00Z',
+          // duration: '24h',
+          progress: 85,
+          type: 'project'
+          //collapsed: true,
+        },
+        {
+          id: 2,
+          label: 'With great power comes great responsibility',
+          user: 'User2',
+          parentId: 1,
+          start: '2021-11-19T00:00:00Z',
+          end: '2021-12-10T17:00:00Z',
+          // duration: 4 * 24 * 60 * 60 * 1000,
+          progress: 50,
+          type: 'milestone',
+          collapsed: true,
+          style: {
+            base: {
+              fill: '#1EBC61',
+              // stroke: '#0EAC51'
+            }
+          }
+        },
+        {
+          id: 3,
+          label: 'Courage is being scared to death, but saddling up anyway.',
+          user:'User3',
+          parentId: 2,
+          start: '2021-11-20T17:00:00Z',
+          end: '2021-12-17T17:00:00Z',
+          // duration: 2 * 24 * 60 * 60 * 1000,
+          progress: 95,
+          type: 'task'
+        },
+        {
+          id: 4,
+          label: 'Put that toy AWAY!',
+          user:'User 4',
+          start: '2021-11-17T17:00:00Z',
+          duration: 2 * 24 * 60 * 60 * 1000,
+          progress: 50,
+          type: 'task',
+          dependentOn: [1]
+        },
+        // {
+        //   id: 5,
+        //   parentId:2,
+        //   label: 'Put that toy AWAY!',
+        //   user:
+        //     '<a href="https://www.google.com/search?q=Paras" target="_blank" style="color:#333;">Paras</a>',
+        //   start: getDate(-24 * 2),
+        //   duration: 3 * 24 * 60 * 60 * 1000,
+        //   progress: 70,
+        //   type: 'task'
+        // }
+      ];
+
+      let options = {
+        maxRows: 100,
+        maxHeight: 300,
+        title: {
+          label: 'Test Chart',
+          html: false
+        },
+        row: {
+          height: 40
+        },
+        calendar: {
+          hour: {
+            display: true
+          }
+        },
+        chart: {
+          progress: {
+            bar: true,
+          },
+          expander: {
+            display: true
+          }
+        },
+        taskList: {
+          columns: [
+            {
+              id: 1,
+              label: 'ID',
+              value: 'id',
+              width: 40
+            },
+            {
+              id: 2,
+              label: 'Description',
+              value: 'label',
+              width: 200,
+              expander: true,
+              html: true,
+              events: {
+                click({ data, column }) {
+                  alert('clicked!\n' + data.label);
+                }
+              }
+            },
+            {
+              id: 3,
+              label: 'Assigned to',
+              value: 'user',
+              width: 130,
+              html: true
+            },
+            {
+              id: 3,
+              label: 'Start',
+              value: task => moment(task.start).format('YYYY-MM-DD'),
+              width: 78
+            },
+            {
+              id: 4,
+              label: 'End',
+              value: task => moment(task.end).format('YYYY-MM-DD'),
+              width: 78
+            },
+            {
+              id: 5,
+              label: 'Type',
+              value: 'type',
+              width: 68
+            },
+            {
+              id: 6,
+              label: '%',
+              value: 'progress',
+              width: 35
+            }
+          ]
+        }
+      };
+
+      // create instance
+      const app = new Vue({
+        el: "#app",
+        components: {
+          'gantt-header': Header,
+          'gantt-elastic': GanttElastic,
+        },
+        data: {
+          tasks: tasks.map(task => Object.assign({}, task)),
+          options,
+          destroy: false  //can destroy the chart if set to TRUE
+        }
+      });
+
+    </script>
+  </body>
+</html>
